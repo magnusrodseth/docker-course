@@ -254,6 +254,8 @@ docker build -t react-app .
 # Run Docker container in interactive mode with shell script
 docker run -it react-app sh
 
-# Output dir structure. This will output this docker-course repository dir structure, because we copied its contents to the container.
+# Output dir structure.
+# This will output this docker-course repository dir structure,
+# because we copied its contents to the container.
 ls
 ```
