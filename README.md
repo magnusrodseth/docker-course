@@ -235,9 +235,6 @@ FROM node:14.16.0-alpine3.13
 **Dockerfile**
 
 ```
-# Using base image with specific version
-FROM node:14.16.0-alpine3.13
-
 # Set working dir to absolute path from root
 WORKDIR /app
 
@@ -265,3 +262,73 @@ ls
 We can exclude files and directories using a `.dockerignore` file.
 
 You can inspect the `.dockerignore` file [here](/.dockerignore).
+
+Note that when running `docker build -t react-app .`, our build context is significantly smaller after ignoring `node_modules`. Additionally, note that the `node_modules` folder is not copied over to the container machine. Thus, we need to run `npm install` to get the dependencies.
+
+#### Running Commands
+
+We use the `RUN` command in the `Dockerfile` to run available commands.
+
+**Dockerfile**
+
+```
+# Use Node Package Manager to install dependencies
+RUN npm install
+```
+
+#### Setting environment variables
+
+We can set environment variables in the `Dockerfile`.
+
+**Dockerfile**
+
+```
+# Sets env variable on machine
+ENV API_URL=http://api.test-app.com/
+```
+
+#### Exposing Ports
+
+Running `npm start`, the frontend application spins up on `localhost:3000`.
+
+**Dockerfile**
+
+```
+# Does not automatically publish the port on the host.
+# Is only a form of documentation,
+# to tell us that the container will listen on port 3000.
+EXPOSE 3000
+```
+
+#### Setting the user
+
+By default, Docker run the application using the root user. This may cause security issues. Hence, we should take precautions to prevent this.
+
+**Terminal**
+
+```
+# Run alpine Linux in interactive mode
+docker run -it alpine
+
+# Add new group
+addgroup app
+
+# Add new system user in the app group with the username app.
+# This is common best practice.
+adduser -S -G app app
+
+# Outputs the groups the the user "app" belongs to
+groups app
+```
+
+**Dockerfile**
+
+```
+# Run all of the steps above in one line
+RUN addgroup app && adduser -S -G app app
+
+# Set the user on the machine
+USER app
+```
+
+#### Defining Entrypoints
