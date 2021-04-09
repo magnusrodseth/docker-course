@@ -71,6 +71,8 @@ Let's say you have a JavaScript application called `app.js` with 1 line: `consol
 
 Docker solves this problem by defining a **Dockerfile**.
 
+**Dockerfile**
+
 ```
 # Pull official Node image from Docker Hub, using the Alpine distribution
 FROM node:alpine
@@ -105,6 +107,8 @@ Typing `echo $0` displays the location of this shell program. This outputs `/bin
 
 In Linux, the package manager is called `apt`. Let's say we want to install the text editor Nano in Ubuntu.
 
+**Terminal**
+
 ```
 # Update the package database
 apt update
@@ -119,6 +123,8 @@ apt remove nano
 #### Searching for text
 
 `grep`, short for "Global Regular Expression Print", is an insanely useful command line tool.
+
+**Terminal**
 
 ```
 # Case sensitive search for "hello" in file1.txt
@@ -144,12 +150,16 @@ grep -ir hello .
 
 Linux allows us to chain commands. This is very useful when defining workflows using Docker.
 
+**Terminal**
+
 ```
 # Create new dir, cd into it and output "Done"
 mkdir test ; cd test ; echo Done
 ```
 
 #### Environment Variables
+
+**Terminal**
 
 ```
 # Prints all environment variables on the machine
@@ -169,6 +179,8 @@ echo DB_USER=john >> .bashrc
 ```
 
 #### Managing Users
+
+**Terminal**
 
 ```
 # Add new user. Set home directory using -m.
@@ -211,6 +223,8 @@ adduser adam
 
 When defining the base image, always use a specific version. If you're using Node as base image, don't use `node:latest` in the `Dockerfile`. This may cause unpredictable releases in the future. **Always specify the version of images you use.**
 
+**Dockerfile**
+
 ```
 # Using base image with specific version
 FROM node:14.16.0-alpine3.13
@@ -221,6 +235,7 @@ FROM node:14.16.0-alpine3.13
 **Dockerfile**
 
 ```
+# Using base image with specific version
 FROM node:14.16.0-alpine3.13
 
 # Set working dir to absolute path from root
