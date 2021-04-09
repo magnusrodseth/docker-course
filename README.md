@@ -369,6 +369,8 @@ Docker caches wherever possible. When a layer isn't changed between builds, Dock
 
 In order to run `npm install`, we only need `package-lock.json` and `package.json`. Thus, we can edit the `COPY` line in the `Dockerfile` as such:
 
+**Dockerfile**
+
 ```
 # Only copy package files
 COPY package*.json .
@@ -381,11 +383,80 @@ COPY . .
 
 ...
 
+# Result in terminal
 => CACHED [2/6] RUN addgroup app && adduser -S -G app app   0.0s
-=> CACHED [3/6] WORKDIR /app    0.0s
-=> CACHED [4/6] COPY package*.json .    0.0s
-=> CACHED [5/6] RUN npm install 0.0s
-=> CACHED [6/6] COPY . .    0.0s
+=> CACHED [3/6] WORKDIR /app                                0.0s
+=> CACHED [4/6] COPY package*.json .                        0.0s
+=> CACHED [5/6] RUN npm install                             0.0s
+=> CACHED [6/6] COPY . .                                    0.0s
 
 ...
+```
+
+#### Removing images
+
+**Terminal**
+
+```
+# Remove dangling images
+docker image prune
+
+# Remove stopped containers
+docker container prune
+
+# Remove image with image id.
+# Can also use the name of the image.
+# Can also add more IDs after the initial IMAGE_ID
+# to remove several images.
+docker image IMAGE_ID
+```
+
+#### Tagging images
+
+```
+# Replace TAG with the desired tag
+# May be version number or codenames
+docker build -t react-app:TAG .
+
+# Remove image with given tag
+docker image remove react-app:TAG
+
+# Give existing image a new tag
+docker image tag IMAGE_ID react-app:TAG
+```
+
+#### Sharing Images
+
+1. **Login** to [Docker Hub](https://hub.docker.com/)
+2. Navigate to **Repositories**
+3. Click **Create Repository**
+4. Set **desired name, description and other settings**
+5. Optionally, you can link Docker Hub to GitHub to **automatically build**
+6. When you are happy with the settings, click **Create**
+7. **Create** Docker image, **login** using terminal and **push** to Docker Hub using commands below
+
+```
+# Create Docker image to be uploaded with
+# given tag to Docker Hub
+docker image tag IMAGE_ID magnusrodseth/react-app:TAG
+
+# You have to provide username and password
+docker login
+
+# Push image with tag to Docker Hub
+docker push magnusrodseth/react-app:TAG
+```
+
+Your image should now be available to pull on Docker Hub.
+
+#### Saving and Loading Images
+
+Let's say you have a Docker image that you want on another machine without going via Docker Hub.
+
+```
+# Compress and zipped Docker image with specific tag
+docker image save -o react-app.tar react-app:TAG
+
+# Load Docker image from zipped file
+docker image load -i react-app.tar
 ```
