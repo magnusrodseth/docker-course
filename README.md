@@ -261,7 +261,7 @@ ls
 
 We can exclude files and directories using a `.dockerignore` file.
 
-You can inspect the `.dockerignore` file [here](/.dockerignore).
+You can inspect the `.dockerignore` file [here](/frontend/.dockerignore).
 
 Note that when running `docker build -t react-app .`, our build context is significantly smaller after ignoring `node_modules`. Additionally, note that the `node_modules` folder is not copied over to the container machine. Thus, we need to run `npm install` to get the dependencies.
 
@@ -332,3 +332,35 @@ USER app
 ```
 
 #### Defining Entrypoints
+
+We want to use `ENTRYPOINT` when we know for sure that a given command should be executed when spinning up a container - there should be no exception.
+
+**Dockerfile**
+
+```
+# Define the entrypoint to be run as an executable
+ENTRYPOINT [ "npm", "start" ]
+```
+
+#### Speeding Up Builds
+
+In order to understand how we can speed up builds in Docker, we must first understand layers in Docker. An image is a collection of layers. A layer can be thought of as the files modified after a given Docker instruction. As an example, running `FROM node:14.16.0-alpine3.13` adds certain files to the image, and that is one layer. Next, `RUN addgroup app && adduser -S -G app app` adds and edits new files, which are on another layer. This repeats for all instructions in the `Dockerfile`.
+
+Layers of a Docker image can be inspected in the terminal.
+
+**Terminal**
+
+```
+# Inspect history of this docker image
+docker history react-app
+
+...
+
+=> RUN /bin/sh -c npm install # buildkit           175MB     buildkit.dockerfile.v0
+
+=> RUN /bin/sh -c addgroup app && adduser -S -G…   4.84kB    buildkit.dockerfile.v0
+
+...
+```
+
+As seen above, we can inspect what command added how much data to our machine.

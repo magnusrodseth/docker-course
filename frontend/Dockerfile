@@ -1,5 +1,9 @@
 FROM node:14.16.0-alpine3.13
 
+RUN addgroup app && adduser -S -G app app
+
+USER app
+
 WORKDIR /app
 
 COPY . .
@@ -10,6 +14,6 @@ ENV API_URL=http://api.test-app.com/
 
 EXPOSE 3000
 
-RUN addgroup app && adduser -S -G app app
+CMD [ "npm", "start" ]
 
-USER app
+ENTRYPOINT [ "npm", "start" ]
