@@ -6,6 +6,8 @@ USER app
 
 WORKDIR /app
 
+RUN mkdir data
+
 COPY package*.json .
 
 RUN npm install

@@ -413,6 +413,8 @@ docker image IMAGE_ID
 
 #### Tagging images
 
+**Terminal**
+
 ```
 # Replace TAG with the desired tag
 # May be version number or codenames
@@ -435,6 +437,8 @@ docker image tag IMAGE_ID react-app:TAG
 6. When you are happy with the settings, click **Create**
 7. **Create** Docker image, **login** using terminal and **push** to Docker Hub using commands below
 
+**Terminal**
+
 ```
 # Create Docker image to be uploaded with
 # given tag to Docker Hub
@@ -453,6 +457,8 @@ Your image should now be available to pull on Docker Hub.
 
 Let's say you have a Docker image that you want on another machine without going via Docker Hub.
 
+**Terminal**
+
 ```
 # Compress and zipped Docker image with specific tag
 docker image save -o react-app.tar react-app:TAG
@@ -460,3 +466,156 @@ docker image save -o react-app.tar react-app:TAG
 # Load Docker image from zipped file
 docker image load -i react-app.tar
 ```
+
+### Working with Containers 📦
+
+#### Starting Containers
+
+**Terminal**
+
+```
+# Run container in detached state
+docker run -d react-app
+
+# Run container in detached state with
+# a custom, easy-to-read name
+docker run -d --name custom-name-here react-app
+```
+
+#### Vieweing the Logs
+
+**Terminal**
+
+```
+# Continuously output the log from the container
+docker logs -f CONTAINER_ID
+
+# Output the log from the container with timestamp
+docker logs -t CONTAINER_ID
+```
+
+#### Publishing Ports
+
+**Terminal**
+
+```
+# Run in detached state
+# Publish on port 80 on the host (value before colon [:])
+# from port 3000 on the container (value after colon [:])
+# Set name "c1"
+docker run -d -p 80:3000 --name c1 react-app
+
+# Get overview of processes / running containers
+docker ps
+
+...
+
+0.0.0.0:80 -> 3000/tcp
+
+...
+```
+
+As seen in the output, the `localhost:80` is mapped to the container's port `3000`.
+
+#### Executing Commands in Running Containers
+
+Using `docker run`, we start a new container and run a command.
+
+Using `docker exec`, we execute a command in a running container.
+
+**Terminal**
+
+```
+# Assumes that c1 is a running container
+# Outputs the files in current directory
+docker exec c1 ls
+```
+
+#### Stopping and starting Containers
+
+**Terminal**
+
+```
+# Stops the running container c1
+docker stop c1
+
+# Starts an existing container c1
+docker start c1
+```
+
+Using `docker run`, we start a new container and run a command.
+
+Using `docker start`, start an existing and previously stopped container.
+
+#### Removing Containers
+
+**Terminal**
+
+```
+# Removes an existing and stopped container
+docker rm c1
+
+# Forces container to stop and then removes it
+docker rm -f c1
+
+# Linux only
+# Filters all Docker containers on the name provided
+docker ps -a | grep c1
+
+# Removes all stopped containers at once
+docker container prune
+```
+
+#### Persisting Data using Volumes
+
+A volume is a storage outside of containers. As an example, it can be located on the host or the cloud.
+
+**Dockerfile**
+
+```
+# Create folder data using custom user
+# This way, we ensure we have permission
+RUN mkdir data
+```
+
+**Terminal**
+
+```
+# Creates new volume
+docker volume create app-data
+
+# Inspect an existing volume
+docker volume inspect app-data
+
+# Run in detatched
+# Map ports
+# Map app-data volume to a directory in the file system of the container
+docker run -d -p 4000:3000 -v app-data:/app/data react-app
+```
+
+Volumes are the correct way to persist data in dockerized applications. Additionally, we can share volumes across containers.
+
+#### Copying files between the Host and Containers
+
+**Terminal**
+
+```
+# Copies an existing file from a container
+# to the current working directory on the host
+docker cp CONTAINER_ID:ABS_PATH_TO_FILE .
+
+# Copies a local file on host machine to
+# an absolute path in the container
+docker cp secret.txt CONTAINER_ID:ABS_PATH
+```
+
+#### Sharing the Source Code with a Container
+
+```
+# Start a container in detatched state
+# Map ports
+# Map the volume from current working directory to app
+docker run -d -p 5001:3000 -v $(pwd):/app react-app
+```
+
+In practice, this lets you edit code base and see real-time changes in your Docker container.
