@@ -381,11 +381,11 @@ COPY . .
 
 ...
 
-=> CACHED [2/6] RUN addgroup app && adduser -S -G app app                                                    0.0s
- => CACHED [3/6] WORKDIR /app                                                                                 0.0s
- => CACHED [4/6] COPY package*.json .                                                                         0.0s
- => CACHED [5/6] RUN npm install                                                                              0.0s
- => CACHED [6/6] COPY . .                                                                                     0.0s
+=> CACHED [2/6] RUN addgroup app && adduser -S -G app app   0.0s
+=> CACHED [3/6] WORKDIR /app    0.0s
+=> CACHED [4/6] COPY package*.json .    0.0s
+=> CACHED [5/6] RUN npm install 0.0s
+=> CACHED [6/6] COPY . .    0.0s
 
- ...
+...
 ```
