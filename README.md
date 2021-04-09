@@ -356,11 +356,36 @@ docker history react-app
 
 ...
 
-=> RUN /bin/sh -c npm install # buildkit           175MB     buildkit.dockerfile.v0
+=> RUN /bin/sh -c npm install # buildkit           175MB
 
-=> RUN /bin/sh -c addgroup app && adduser -S -G…   4.84kB    buildkit.dockerfile.v0
+=> RUN /bin/sh -c addgroup app && adduser -S -G…   4.84kB
 
 ...
 ```
 
 As seen above, we can inspect what command added how much data to our machine.
+
+Docker caches wherever possible. When a layer isn't changed between builds, Docker reuses the layer when building the image.
+
+In order to run `npm install`, we only need `package-lock.json` and `package.json`. Thus, we can edit the `COPY` line in the `Dockerfile` as such:
+
+```
+# Only copy package files
+COPY package*.json .
+
+# Install dependencies
+RUN npm install
+
+# Copy rest of files
+COPY . .
+
+...
+
+=> CACHED [2/6] RUN addgroup app && adduser -S -G app app                                                    0.0s
+ => CACHED [3/6] WORKDIR /app                                                                                 0.0s
+ => CACHED [4/6] COPY package*.json .                                                                         0.0s
+ => CACHED [5/6] RUN npm install                                                                              0.0s
+ => CACHED [6/6] COPY . .                                                                                     0.0s
+
+ ...
+```

@@ -6,9 +6,11 @@ USER app
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json .
 
 RUN npm install
+
+COPY . .
 
 ENV API_URL=http://api.test-app.com/
 
