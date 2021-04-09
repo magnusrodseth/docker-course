@@ -34,7 +34,7 @@ Additionally, if a new developer needs to spin up your application, he simply ne
 
 A **virtual machine**, or VMs for short, is an absatraction of a machine or physical hardware. Using VMs, we can _run apps in isolated environments_. However, each VM _needs a full OS to function_. This causes it to be _slow to start_ and quite _resource intensive_.
 
-A **container** is an isolated environment for running an application. As with VMs, containers also allow us to _run multiple apps in isolation_. Additionally, they are _lightweight_ and _use the OS of the host_. Because the OS already runs on the host, a container can _start relatively quickly_. Container also need _less hardware resources_. In theory, using containers, we can run thousands of containers side by side on one host.
+A **container** is an isolated environment for running an application. As with VMs, containers also allow us to _run multiple apps in isolation_. Additionally, they are _lightweight_ and _use the OS of the host_. Because the OS already runs on the host, a container can _start relatively quickly_. Containers also require _less hardware resources_. In theory, using containers, we can run thousands of containers side by side on one host.
 
 #### Docker Architecture
 
@@ -195,3 +195,50 @@ adduser adam
 
 ### Building Images 🖼
 
+#### Images and Containers
+
+**An image** includes everything an application needs to run:
+
+- A cut-down OS
+- Third-party libraries
+- Application files
+- Environment variables
+- etc...
+
+**A container** provides an isolated environment. Containers can be started, stopped and restarted. Technically, a container is just a process; that is, a running instance of an application.
+
+#### Dockerfile Instructions
+
+When defining the base image, always use a specific version. If you're using Node as base image, don't use `node:latest` in the `Dockerfile`. This may cause unpredictable releases in the future. **Always specify the version of images you use.**
+
+```
+# Using base image with specific version
+FROM node:14.16.0-alpine3.13
+```
+
+#### Copying files and directories
+
+**Dockerfile**
+
+```
+FROM node:14.16.0-alpine3.13
+
+# Set working dir to absolute path from root
+WORKDIR /app
+
+# Copy entire dir into working directory
+COPY . .
+```
+
+**Terminal**
+
+```
+# Build Docker image
+docker build -t react-app .
+
+# Run Docker container in interactive mode with shell script
+docker run -it react-app sh
+
+# Output dir structure. This will output this docker-course repository dir structure, because we copied its contents to the container.
+ls
+```
