@@ -259,3 +259,9 @@ docker run -it react-app sh
 # because we copied its contents to the container.
 ls
 ```
+
+#### Excluding files and directories
+
+We can exclude files and directories using a `.dockerignore` file.
+
+You can inspect the `.dockerignore` file [here](/.dockerignore).
