@@ -659,7 +659,7 @@ Alternatively, you can use the following steps:
 
 A Docker Compose file must be named `docker-compose.yml`. You can see a list of valid properties in Docker Compose [here](https://docs.docker.com/compose/compose-file/compose-file-v3/).
 
-**`docker-compose`.yml**
+**`docker-compose.yml`**
 
 ```
 # Set the version of Docker Compose
@@ -790,4 +790,3 @@ Because we need to wait for the database to be up and running in order to migrat
 ```
 
 ### Deploying Applications ☁️
-
