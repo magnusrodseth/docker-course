@@ -659,7 +659,7 @@ Alternatively, you can use the following steps:
 
 A Docker Compose file must be named `docker-compose.yml`. You can see a list of valid properties in Docker Compose [here](https://docs.docker.com/compose/compose-file/compose-file-v3/).
 
-**docker-compose-yml**
+**docker-compose.yml**
 
 ```
 # Set the version of Docker Compose
@@ -704,4 +704,87 @@ services:
 # volumes in the database service
 volumes:
     VOLUME:
+```
+
+#### Starting and stopping the Application
+
+**Terminal**
+
+```
+# Start containers
+docker-compose up
+
+# Start containers in detached state
+docker-compose up -d
+
+# Outputs all running containers relevant to current app
+docker-compose ps
+
+# Stops and removes containers
+# Images are still present
+docker-compose down
+```
+
+#### Docker Networking
+
+When we run our application with `docker-compose`, Docker Compose will automatically add a network, and then add our container to that network. This allows containers to talk to eachother.
+
+```
+# Run containers in detached state
+docker-compose up -d
+
+# Outputs an overview of running Docker Networks
+docker network ls
+```
+
+#### Viewing Logs
+
+```
+# Outputs logs across all containers in aoo
+docker-compose logs
+
+# Outputs running containers
+docker ps
+
+# Follow the output of a given container
+docker logs CONTAINER_ID -f
+```
+
+#### Migrating the Database
+
+Oftentimes, we want our database to have a certain shape in a given release. This is called database migration.
+
+This repository uses the `migrate-mongo` package for database migration.
+
+**`backend/package.json`**
+
+```
+ "scripts": {
+    "db:up": "migrate-mongo up",
+    "start": "nodemon --ignore './tests' index.js",
+    "test": "jest --watchAll --colors"
+  }
+```
+
+Thus, run `npm run db:up` to migrate database.
+
+Because we need to wait for the database to be up and running in order to migrate it, we use a tool recommended by Docker called [`wait-for-it`](https://docs.docker.com/compose/startup-order/).
+
+#### Running Tests
+
+**`docker-compose.yml`**
+
+```
+  # Frontend tests in Dcoker
+  frontend-tests:
+
+    # Use the newly built frontend image
+    image: docker-course_frontend
+
+    volumes:
+      - ./frontend:/app
+
+    # Override default command, and rather
+    # run test
+    command: npm test
 ```

@@ -2,21 +2,25 @@ version: "3.8"
 
 services:
   frontend:
-    depends_on: 
+    depends_on:
       - backend
     build: ./frontend
     ports:
       - 3000:3000
+    volumes:
+      - ./frontend:/app
 
-  backend: 
-    depends_on: 
+  backend:
+    depends_on:
       - db
     build: ./backend
-    ports: 
+    ports:
       - 3001:3001
-    environment: 
+    environment:
       DB_URL: mongodb://db/vidly
     command: ./docker-entrypoint.sh
+    volumes:
+      - ./backend:/app
 
   db:
     image: mongo:4.0-xenial
@@ -25,6 +29,15 @@ services:
     # vidly is the application name
     volumes:
       - vidly:/data/db
+
+  # Frontend tests in Dcoker
+  frontend-tests:
+    # Use the newly built frontend image
+    image: docker-course_frontend
+    volumes:
+      - ./frontend:/app
+    # Override default command, and rather run test
+    command: npm test
 
 volumes:
   # vidly is the application name
