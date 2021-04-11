@@ -117,3 +117,4 @@ dist
 
 # Custom ignores
 .DS_Store
+build

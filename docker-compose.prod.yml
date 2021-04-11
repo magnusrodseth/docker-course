@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - 80:80
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    ports:
+      - 3001:3001
+    environment:
+      DB_URL: mongodb://db/vidly
+    command: ./docker-entrypoint.sh
+    restart: unless-stopped
+
+  db:
+    image: mongo:4.0-xenial
+    ports:
+      - 27017:27017
+    # vidly is the application name
+    volumes:
+      - vidly:/data/db
+    restart: unless-stopped
+
+volumes:
+  # vidly is the application name
+  vidly:

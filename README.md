@@ -795,3 +795,277 @@ frontend-tests:
 ```
 
 ### Deploying Applications ☁️
+
+#### Deployment Options
+
+When deploying a dockerized application, we can either use single host deployment or cluster deployment.
+
+**Single Host Deployment** is suitable for many cases, but may be lackluster in large-scale applications. Hence, Single Host Deployment will be used in this course.
+
+**Cluster deployment** allow for high availability and scalability. There are different cluster solutions, where **Kubernetes** is the most popular solution.
+
+#### Getting a Virtual Private Server
+
+Some of the most popular VPS options include:
+
+- DigitalOcean
+- Google Cloud Platform (GCP)
+- Microsoft Azure
+- Amazon Web Services (AWS)
+
+DigitalOcean is the simplest VPS. The further down the list we get, the more complex the VPS solution gets. **DigitalOcean** is the VPS solution used in this course.
+
+#### Installing a Docker Machine
+
+Follow [this](https://github.com/docker/machine/releases) **Installation Guide** on GitHub.
+
+Verify that `docker-machine` is installed on your computer. by typing `docker-machine --version` in your terminal.
+
+#### Provisioning a Host
+
+Inspect available drivers using [this link](https://docs.docker.com/machine/drivers/). In this course, we will use [DigitalOcean](https://docs.docker.com/machine/drivers/digital-ocean/). Use the provided link to inspect commands options when creating the Docker Machine using the steps in the Terminal below.
+
+Now, go to DigitalOcean Control Panel to acquire an access token, so that Docker Machine can talk to DigitalOcean. [Follow this documentation for DigitalCoean](https://docs.digitalocean.com/reference/api/create-personal-access-token/).
+
+Execute the following in the Terminal.
+
+**`Terminal`**
+
+```shell
+# Get DIGITAL_OCEAN_ACCESS_TOKEN from DigitalOcean cloud portal
+
+# Install specific Docker version, because of
+# unresolved problem with Docker Machine,
+# as of December 2020: --engine-install-url
+
+# DOCKER_MACHINE_NAME can be repository name
+docker-machine create \
+    --driver digitalocean \
+    --digitalocean-access-token DIGITAL_OCEAN_ACCESS_TOKEN \
+    --engine-install-url "https://releases.rancher.com/install-docker/19.03.9.sh" \
+    DOCKER_MACHINE_NAME
+```
+
+By default the Docker Machine provisions with Ubuntu. Then, Docker is installed on the Docker Machine. You should now be able to see a new _Droplet_ on DigitalOcean cloud. A _Droplet_ is a fancy word for a server on DigitalOcean.
+
+#### Connecting to the Host
+
+To connect to the Docker Machine, we will use SSH in the Terminal. **The beauty of Docker Machine** is that it abstracts away the complexity of SSH from us, allowing for a swift a pain-free connection experience.
+
+**`Terminal`**
+
+```shell
+# Outputs all existing Docker Machines
+docker-machine ls
+
+# Connects to given docker machine using its name
+docker-machine ssh DOCKER_MACHINE_NAME
+```
+
+#### Defining the Production Configuration
+
+We don't neccessarily want the exact same Compose file for development and production. Thus, we create `docker-compose.prod.yml` to define the Compose file used in production. `prod` can be interchanged with anything, be the following example follows convention.
+
+**`docker-compose.prod.yml`**
+
+```yaml
+version: "3.8"
+
+services:
+  frontend:
+    build: ./frontend
+
+    # Map port 80 of the host to
+    # port 3000 on the container
+    ports:
+      - 80:3000
+
+    # Restarts container only if we manually # stop it
+    restart: unless-stopped
+
+    # Notice how there's no need for volumes in production
+
+  backend:
+    build: ./backend
+    ports:
+      - 3001:3001
+    environment:
+      DB_URL: mongodb://db/vidly
+    command: ./docker-entrypoint.sh
+    restart: unless-stopped
+
+  db:
+    image: mongo:4.0-xenial
+    ports:
+      - 27017:27017
+    # vidly is the application name
+    volumes:
+      - vidly:/data/db
+    restart: unless-stopped
+
+volumes:
+  # vidly is the application name
+  vidly:
+```
+
+Read more about restart policy in Compose files [here](https://docs.docker.com/compose/compose-file/compose-file-v3/#restart).
+
+#### Reducing Docker Image Size
+
+Docker images can get unbelievably large, which is not suitable for production.
+
+Running `npm run build` in `/frontend` creates optimized assets for production. All these assets are stored in the `/frontend/build` folder.
+
+Now, we can make a separate `Dockerfile` suitable for production, because all we need to do is copy files in `/frontend/build`.
+
+So, we create a `Dockerfile.prod` in `/frontend`.
+
+**`Dockerfile.prod`**
+
+```Dockerfile
+# Step 1: Build stage
+FROM node:14.16.0-alpine3.13 AS build-stage
+
+WORKDIR /app
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+# Step 2: Production stage
+FROM nginx:1.12-alpine
+
+RUN addgroup app && adduser -S -G app app
+
+USER app
+
+# Copy all files from build-stage to be use din production
+COPY  --from=build-stage /app/build /usr/share/nginx/html
+
+# Expose default port for web traffic
+EXPOSE 80
+
+ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
+```
+
+Now, we can build an image for `/frontend` that is optimized for web using the terminal.
+
+**`Terminal`**
+
+```shell
+# docker-course_web_opt describes how this images is
+# optimized for web
+docker build -t docker-course_web_opt -f Dockerfile.prod .
+
+...
+
+docker-course_web_opt   16.2MB
+docker-course_frontend  300MB
+docker-course_backend   184MB
+
+...
+```
+
+Notice how the image built for web is only 16.2MB large.
+
+In `docker-compose.prod.yml`, we need to change a few properties to fit our new `frontend/Dockerfile.prod`.
+
+**`docker-compose.prod.yml`**
+
+```yaml
+---
+frontend:
+  # Set context to frontend directory
+  # Specify Dockerfile
+  build:
+    context: ./frontend
+    dockerfile: Dockerfile.prod
+
+  # Map host port 80 to container port 80
+  ports:
+    - 80:80
+  restart: unless-stopped
+```
+
+Now, we can run `docker-compose -f docker-compose.prod.yml build` in `/` directory.
+
+#### Deploying the Application
+
+**`Terminal`**
+
+```shell
+# Outputs overview of existing Docker Machines
+docker-machine ls
+
+# Outputs env variables for given Docker Machine
+docker-machine env MACHINE_NAME
+
+# Run this command to configure your shell:
+eval $(docker-machine env MACHINE_NAME)
+
+# The line above results in the following:
+#   - Any commands typed in the terminal will be sent
+#   to the MACHINE_NAME Docker Machine
+#
+#   - Thus, the Docker client in your terminal
+#   will be talking to the Docker Machine on DigitalOcean
+
+# Output overview of existing images on the remote Docker Machine
+docker images
+
+# Compose production build
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+If you encounter a **Permission denied** error when running `docker-compose -f docker-compose.prod.yml up -d` that looks a bit like the following:
+
+**`Terminal Troubleshooting`**
+
+```shell
+npm WARN checkPermissions Missing write access to /app
+npm WARN vidly-backend@1.0.0 No description
+npm WARN vidly-backend@1.0.0 No repository field.
+
+npm ERR! code EACCES
+npm ERR! syscall access
+npm ERR! path /app
+npm ERR! errno -13
+npm ERR! Error: EACCES: permission denied, access '/app'
+npm ERR!  [Error: EACCES: permission denied, access '/app'] {
+npm ERR!   errno: -13,
+npm ERR!   code: 'EACCES',
+npm ERR!   syscall: 'access',
+npm ERR!   path: '/app'
+npm ERR! }
+```
+
+This may be because the `Dockerfile` does not respect the `app` user when executing `WORKDIR /app`. This issue should be resolved in the latest version of Docker, as long as Docker uses build-kit. _If the output from Docker commands is colorized, this should not be a problem_. However, we are currently using an older version of Docker on this particular VPS (DigitalOcean).
+
+To fix this issue, we edit the `backend/Dockerfile` as follows:
+
+**`backend/Dockerfile`**
+
+```Dockerfile
+FROM node:14.16.0-alpine3.13
+
+RUN addgroup app && adduser -S -G app app
+
+# Create /app directory
+# Set the current owner of this dir
+# to be the app user
+RUN mkdir /app && chown app:app /app
+
+USER app
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
