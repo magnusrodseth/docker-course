@@ -71,7 +71,7 @@ Let's say you have a JavaScript application called `app.js` with 1 line: `consol
 
 Docker solves this problem by defining a **Dockerfile**.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Pull official Node image from Docker Hub, using the Alpine distribution
@@ -223,7 +223,7 @@ adduser adam
 
 When defining the base image, always use a specific version. If you're using Node as base image, don't use `node:latest` in the `Dockerfile`. This may cause unpredictable releases in the future. **Always specify the version of images you use.**
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Using base image with specific version
@@ -232,7 +232,7 @@ FROM node:14.16.0-alpine3.13
 
 #### Copying files and directories
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Set working dir to absolute path from root
@@ -269,7 +269,7 @@ Note that when running `docker build -t react-app .`, our build context is signi
 
 We use the `RUN` command in the `Dockerfile` to run available commands.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Use Node Package Manager to install dependencies
@@ -280,7 +280,7 @@ RUN npm install
 
 We can set environment variables in the `Dockerfile`.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Sets env variable on machine
@@ -291,7 +291,7 @@ ENV API_URL=http://api.test-app.com/
 
 Running `npm start`, the frontend application spins up on `localhost:3000`.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Does not automatically publish the port on the host.
@@ -321,7 +321,7 @@ adduser -S -G app app
 groups app
 ```
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Run all of the steps above in one line
@@ -335,7 +335,7 @@ USER app
 
 We want to use `ENTRYPOINT` when we know for sure that a given command should be executed when spinning up a container - there should be no exception.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Define the entrypoint to be run as an executable
@@ -369,7 +369,7 @@ Docker caches wherever possible. When a layer isn't changed between builds, Dock
 
 In order to run `npm install`, we only need `package-lock.json` and `package.json`. Thus, we can edit the `COPY` line in the `Dockerfile` as such:
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Only copy package files
@@ -570,7 +570,7 @@ docker container prune
 
 A volume is a storage outside of containers. As an example, it can be located on the host or the cloud.
 
-**Dockerfile**
+**`Dockerfile`**
 
 ```
 # Create folder data using custom user
@@ -659,7 +659,7 @@ Alternatively, you can use the following steps:
 
 A Docker Compose file must be named `docker-compose.yml`. You can see a list of valid properties in Docker Compose [here](https://docs.docker.com/compose/compose-file/compose-file-v3/).
 
-**docker-compose.yml**
+**`docker-compose`.yml**
 
 ```
 # Set the version of Docker Compose
@@ -788,3 +788,6 @@ Because we need to wait for the database to be up and running in order to migrat
     # run test
     command: npm test
 ```
+
+### Deploying Applications ☁️
+
