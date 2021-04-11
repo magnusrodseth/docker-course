@@ -73,7 +73,7 @@ Docker solves this problem by defining a **Dockerfile**.
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Pull official Node image from Docker Hub, using the Alpine distribution
 FROM node:alpine
 
@@ -107,9 +107,9 @@ Typing `echo $0` displays the location of this shell program. This outputs `/bin
 
 In Linux, the package manager is called `apt`. Let's say we want to install the text editor Nano in Ubuntu.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Update the package database
 apt update
 
@@ -124,9 +124,9 @@ apt remove nano
 
 `grep`, short for "Global Regular Expression Print", is an insanely useful command line tool.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Case sensitive search for "hello" in file1.txt
 grep hello file1.txt
 
@@ -150,18 +150,18 @@ grep -ir hello .
 
 Linux allows us to chain commands. This is very useful when defining workflows using Docker.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Create new dir, cd into it and output "Done"
 mkdir test ; cd test ; echo Done
 ```
 
 #### Environment Variables
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Prints all environment variables on the machine
 printenv
 
@@ -180,9 +180,9 @@ echo DB_USER=john >> .bashrc
 
 #### Managing Users
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Add new user. Set home directory using -m.
 useradd -m john
 
@@ -234,7 +234,7 @@ FROM node:14.16.0-alpine3.13
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Set working dir to absolute path from root
 WORKDIR /app
 
@@ -242,9 +242,9 @@ WORKDIR /app
 COPY . .
 ```
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Build Docker image
 docker build -t react-app .
 
@@ -271,7 +271,7 @@ We use the `RUN` command in the `Dockerfile` to run available commands.
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Use Node Package Manager to install dependencies
 RUN npm install
 ```
@@ -282,7 +282,7 @@ We can set environment variables in the `Dockerfile`.
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Sets env variable on machine
 ENV API_URL=http://api.test-app.com/
 ```
@@ -293,7 +293,7 @@ Running `npm start`, the frontend application spins up on `localhost:3000`.
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Does not automatically publish the port on the host.
 # Is only a form of documentation,
 # to tell us that the container will listen on port 3000.
@@ -304,9 +304,9 @@ EXPOSE 3000
 
 By default, Docker run the application using the root user. This may cause security issues. Hence, we should take precautions to prevent this.
 
-**Terminal**
+**`Terminal`**
 
-```
+```Dockerfile
 # Run alpine Linux in interactive mode
 docker run -it alpine
 
@@ -323,7 +323,7 @@ groups app
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Run all of the steps above in one line
 RUN addgroup app && adduser -S -G app app
 
@@ -337,7 +337,7 @@ We want to use `ENTRYPOINT` when we know for sure that a given command should be
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Define the entrypoint to be run as an executable
 ENTRYPOINT [ "npm", "start" ]
 ```
@@ -348,9 +348,9 @@ In order to understand how we can speed up builds in Docker, we must first under
 
 Layers of a Docker image can be inspected in the terminal.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Inspect history of this docker image
 docker history react-app
 
@@ -371,7 +371,7 @@ In order to run `npm install`, we only need `package-lock.json` and `package.jso
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Only copy package files
 COPY package*.json .
 
@@ -395,9 +395,9 @@ COPY . .
 
 #### Removing images
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Remove dangling images
 docker image prune
 
@@ -413,9 +413,9 @@ docker image IMAGE_ID
 
 #### Tagging images
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Replace TAG with the desired tag
 # May be version number or codenames
 docker build -t react-app:TAG .
@@ -437,9 +437,9 @@ docker image tag IMAGE_ID react-app:TAG
 6. When you are happy with the settings, click **Create**
 7. **Create** Docker image, **login** using terminal and **push** to Docker Hub using commands below
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Create Docker image to be uploaded with
 # given tag to Docker Hub
 docker image tag IMAGE_ID magnusrodseth/react-app:TAG
@@ -457,9 +457,9 @@ Your image should now be available to pull on Docker Hub.
 
 Let's say you have a Docker image that you want on another machine without going via Docker Hub.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Compress and zipped Docker image with specific tag
 docker image save -o react-app.tar react-app:TAG
 
@@ -471,9 +471,9 @@ docker image load -i react-app.tar
 
 #### Starting Containers
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Run container in detached state
 docker run -d react-app
 
@@ -484,9 +484,9 @@ docker run -d --name custom-name-here react-app
 
 #### Vieweing the Logs
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Continuously output the log from the container
 docker logs -f CONTAINER_ID
 
@@ -496,9 +496,9 @@ docker logs -t CONTAINER_ID
 
 #### Publishing Ports
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Run in detached state
 # Publish on port 80 on the host (value before colon [:])
 # from port 3000 on the container (value after colon [:])
@@ -523,9 +523,9 @@ Using `docker run`, we start a new container and run a command.
 
 Using `docker exec`, we execute a command in a running container.
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Assumes that c1 is a running container
 # Outputs the files in current directory
 docker exec c1 ls
@@ -533,9 +533,9 @@ docker exec c1 ls
 
 #### Stopping and starting Containers
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Stops the running container c1
 docker stop c1
 
@@ -549,9 +549,9 @@ Using `docker start`, start an existing and previously stopped container.
 
 #### Removing Containers
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Removes an existing and stopped container
 docker rm c1
 
@@ -572,15 +572,15 @@ A volume is a storage outside of containers. As an example, it can be located on
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Create folder data using custom user
 # This way, we ensure we have permission
 RUN mkdir data
 ```
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Creates new volume
 docker volume create app-data
 
@@ -597,9 +597,9 @@ Volumes are the correct way to persist data in dockerized applications. Addition
 
 #### Copying files between the Host and Containers
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Copies an existing file from a container
 # to the current working directory on the host
 docker cp CONTAINER_ID:ABS_PATH_TO_FILE .
@@ -611,7 +611,9 @@ docker cp secret.txt CONTAINER_ID:ABS_PATH
 
 #### Sharing the Source Code with a Container
 
-```
+**`Terminal`**
+
+```shell
 # Start a container in detatched state
 # Map ports
 # Map the volume from current working directory to app
@@ -632,9 +634,9 @@ To verify that you have Dcoker Compose installed, type `docker-compose --version
 
 #### Cleaning up our Workspace
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Outputs the image IDs of existing Docker images
 docker image ls -q
 
@@ -661,56 +663,56 @@ A Docker Compose file must be named `docker-compose.yml`. You can see a list of 
 
 **`docker-compose.yml`**
 
-```
+```yaml
 # Set the version of Docker Compose
 version: "3.8"
 
 services:
-    frontend:
-        # Tell Docker to look for Dockerfile in frontend
-        # directory in current working directory
-        build: ./frontend
+  frontend:
+    # Tell Docker to look for Dockerfile in frontend
+    # directory in current working directory
+    build: ./frontend
 
-        # Port mapping.
-        # Because we can have multiple port mappings,
-        # we use the list syntax in .yml
-        ports:
-            - 3000:3000
-    backend:
-        # Tell Docker to look for Dockerfile in backend
-        # directory in current working directory
-        build: ./backend
+    # Port mapping.
+    # Because we can have multiple port mappings,
+    # we use the list syntax in .yml
+    ports:
+      - 3000:3000
+  backend:
+    # Tell Docker to look for Dockerfile in backend
+    # directory in current working directory
+    build: ./backend
 
-        ports:
-            - 3001:3001
+    ports:
+      - 3001:3001
 
-        # Set env variables
-        environment:
-            DB_URL: MONGO_DB_CONNECTION_STRING
-    database:
-        # Pull an existing Docker image
-        image: mongo:4.0-xenial
+    # Set env variables
+    environment:
+      DB_URL: MONGO_DB_CONNECTION_STRING
+  database:
+    # Pull an existing Docker image
+    image: mongo:4.0-xenial
 
-        ports:
-            - 27017:27017
+    ports:
+      - 27017:27017
 
-        # Map custom volume VOLUME to a directory
-        # /data/db is MongoDB's default storage folder
-        volumes:
-            - VOLUME:/data/db
+    # Map custom volume VOLUME to a directory
+    # /data/db is MongoDB's default storage folder
+    volumes:
+      - VOLUME:/data/db
 
 # Define the custom volumes to be mapped later
 # Note that this volume name corresponds with
 # volumes in the database service
 volumes:
-    VOLUME:
+  VOLUME:
 ```
 
 #### Starting and stopping the Application
 
-**Terminal**
+**`Terminal`**
 
-```
+```shell
 # Start containers
 docker-compose up
 
@@ -729,7 +731,9 @@ docker-compose down
 
 When we run our application with `docker-compose`, Docker Compose will automatically add a network, and then add our container to that network. This allows containers to talk to eachother.
 
-```
+**`Terminal`**
+
+```shell
 # Run containers in detached state
 docker-compose up -d
 
@@ -739,7 +743,9 @@ docker network ls
 
 #### Viewing Logs
 
-```
+**`Terminal`**
+
+```shell
 # Outputs logs across all containers in aoo
 docker-compose logs
 
@@ -758,7 +764,7 @@ This repository uses the `migrate-mongo` package for database migration.
 
 **`backend/package.json`**
 
-```
+```json
  "scripts": {
     "db:up": "migrate-mongo up",
     "start": "nodemon --ignore './tests' index.js",
@@ -774,19 +780,18 @@ Because we need to wait for the database to be up and running in order to migrat
 
 **`docker-compose.yml`**
 
-```
-  # Frontend tests in Dcoker
-  frontend-tests:
+```yaml
+# Frontend tests in Dcoker
+frontend-tests:
+  # Use the newly built frontend image
+  image: docker-course_frontend
 
-    # Use the newly built frontend image
-    image: docker-course_frontend
+  volumes:
+    - ./frontend:/app
 
-    volumes:
-      - ./frontend:/app
-
-    # Override default command, and rather
-    # run test
-    command: npm test
+  # Override default command, and rather
+  # run test
+  command: npm test
 ```
 
 ### Deploying Applications ☁️
