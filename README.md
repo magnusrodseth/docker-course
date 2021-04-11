@@ -225,7 +225,7 @@ When defining the base image, always use a specific version. If you're using Nod
 
 **`Dockerfile`**
 
-```
+```Dockerfile
 # Using base image with specific version
 FROM node:14.16.0-alpine3.13
 ```
