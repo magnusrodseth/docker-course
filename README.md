@@ -619,3 +619,89 @@ docker run -d -p 5001:3000 -v $(pwd):/app react-app
 ```
 
 In practice, this lets you edit code base and see real-time changes in your Docker container.
+
+### Running Multi-container Applications 🤝
+
+#### What is Docker Compose?
+
+Docker Compose is a tool built on top of the Docker engine. It makes it a lot easier to run multi-container applications.
+
+Follow [this guide](https://docs.docker.com/compose/install/) to install Docker Compose.
+
+To verify that you have Dcoker Compose installed, type `docker-compose --version` in your Terminal.
+
+#### Cleaning up our Workspace
+
+**Terminal**
+
+```
+# Outputs the image IDs of existing Docker images
+docker image ls -q
+
+# Force remove all the images outputted above
+docker image rm -f $(docker image ls -q)
+
+# Outputs the container IDs of existing Docker containers
+docker container ls -a -q
+
+# Force remove all the containers outputted above
+docker container rm -f $(docker container ls -a -q)
+```
+
+Alternatively, you can use the following steps:
+
+1. Click on the **Docker Desktop icon**
+2. Go to **Preferences**
+3. Click on the **Troubleshoot** button that looks like a bug
+4. Click **Clean / Purge data**. Note that this will restart Docker engine.
+
+#### Creating a Compose File
+
+A Docker Compose file must be named `docker-compose.yml`. You can see a list of valid properties in Docker Compose [here](https://docs.docker.com/compose/compose-file/compose-file-v3/).
+
+**docker-compose-yml**
+
+```
+# Set the version of Docker Compose
+version: "3.8"
+
+services:
+    frontend:
+        # Tell Docker to look for Dockerfile in frontend
+        # directory in current working directory
+        build: ./frontend
+
+        # Port mapping.
+        # Because we can have multiple port mappings,
+        # we use the list syntax in .yml
+        ports:
+            - 3000:3000
+    backend:
+        # Tell Docker to look for Dockerfile in backend
+        # directory in current working directory
+        build: ./backend
+
+        ports:
+            - 3001:3001
+
+        # Set env variables
+        environment:
+            DB_URL: MONGO_DB_CONNECTION_STRING
+    database:
+        # Pull an existing Docker image
+        image: mongo:4.0-xenial
+
+        ports:
+            - 27017:27017
+
+        # Map custom volume VOLUME to a directory
+        # /data/db is MongoDB's default storage folder
+        volumes:
+            - VOLUME:/data/db
+
+# Define the custom volumes to be mapped later
+# Note that this volume name corresponds with
+# volumes in the database service
+volumes:
+    VOLUME:
+```
